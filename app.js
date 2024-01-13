@@ -41,7 +41,7 @@ app.post('/register', async (request, response) => {
   if (dbUser === undefined) {
     // check if password is strong
     if (password.length < 5) {
-      response.status = 400
+      response.status(400)
       response.send('Password is too short')
     } else {
       // Create User
@@ -60,7 +60,7 @@ app.post('/register', async (request, response) => {
       response.send('User created successfully')
     }
   } else {
-    response.status = 400
+    response.status(400)
     response.send('User already exists')
   }
 })
@@ -75,7 +75,7 @@ app.post('/login', async (request, response) => {
   const dbUser = await database.get(selectUserQuery)
   if (dbUser === undefined) {
     // Invalid user login
-    response.status = 400
+    response.status(400)
     response.send('Invalid user')
   } else {
     // check password
@@ -83,7 +83,7 @@ app.post('/login', async (request, response) => {
     if (isPasswordMatched === true) {
       response.send('Login success!')
     } else {
-      response.status = 400
+      response.status(400)
       response.send('Invalid password')
     }
   }
@@ -97,29 +97,26 @@ app.put('/change-password', async (request, response) => {
   WHERE username = "${username}";
   `
   const dbUser = await database.get(selectUserQuery)
-  if (dbUser !== undefined) {
-    // check password
-    const isPasswordMatched = await bcrypt.compare(oldPassword, dbUser.password)
-    if (isPasswordMatched === true) {
-      if (newPassword.length < 5) {
-        // check if new password is too short
-        response.status = 400
-        response.send('Password is too short')
-      } else {
-        const hashedPassword = await bcrypt.hash(newPassword, 10)
-        const updatePasswordQuery = `
+  // check password
+  const isPasswordMatched = await bcrypt.compare(oldPassword, dbUser.password)
+  if (isPasswordMatched === true) {
+    if (newPassword.length <= 5) {
+      // check if new password is too short
+      response.status(400)
+      response.send('Password is too short')
+    } else {
+      const hashedPassword = await bcrypt.hash(newPassword, 10)
+      const updatePasswordQuery = `
         UPDATE user
         SET password = "${hashedPassword}";
         `
-        console.log(hashedPassword)
-        console.log(newPassword)
-        response.send('Password updated')
-      }
-    } else {
-      // Invalid current password
-      response.status = 400
-      response.send('Invalid current password')
+      await database.run(updatePasswordQuery)
+      response.send('Password updated')
     }
+  } else {
+    // Invalid current password
+    response.status(400)
+    response.send('Invalid current password')
   }
 })
 
