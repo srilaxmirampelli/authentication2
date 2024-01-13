@@ -1,0 +1,37 @@
+// Register User API 1
+
+
+POST http://localhost:3000/register
+Content-Type: application/json
+
+{
+  "username": "sriya",
+  "name": "sriya Rampelli",
+  "password": "sriya123",
+  "gender": "female",
+  "location": "warangal"
+}
+
+// Login user API 2
+
+
+POST http://localhost:3000/login
+Content-Type: application/json
+
+{
+  "username": "sriya",
+  "password": "sriya123"
+}
+
+// Update password API 3
+
+
+
+PUT http://localhost:3000/change-password
+Content-Type: application/json
+
+{
+  "username": "sriya",
+  "oldPassword": "sriya123",
+  "newPassword": "sriya@123"
+}
